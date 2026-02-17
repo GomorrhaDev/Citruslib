@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using BepInEx;
 using Epic.OnlineServices.Auth;
 using HarmonyLib;
@@ -15,10 +13,7 @@ using UnityEngine;
 
 namespace CitrusLib
 {
-
     
-
-
     [BepInPlugin(pluginGuid, pluginName, pluginVersion)]
     public class Main : BaseUnityPlugin
     {
@@ -34,6 +29,25 @@ namespace CitrusLib
 
             harmony.PatchAll();
 
+            WeaponPatchManager.Initialize();
+
+            // Helper to parse item by ID or Item enum name (case-insensitive, allows optional leading underscore)
+            bool TryParseItemId(string input, out int id)
+            {
+                id = 0;
+                if (int.TryParse(input, out id)) return true;
+                if (Enum.TryParse<Item>(input, true, out var item))
+                {
+                    id = (int)item;
+                    return true;
+                }
+                if (!string.IsNullOrEmpty(input) && input[0] != '_' && Enum.TryParse<Item>("_" + input, true, out var underscored))
+                {
+                    id = (int)underscored;
+                    return true;
+                }
+                return false;
+            }
 
             Citrus.AddCommand("team", delegate (string[] prms, TABGPlayerServer player)
              {
@@ -97,6 +111,32 @@ namespace CitrusLib
                  }
              }, 
             pluginName, "Changes or queries a player's team", "<get|set> <player> [index](if setting)",2);
+
+            Citrus.AddCommand("reloadweps", delegate (string[] prms, TABGPlayerServer player)
+            {
+                WeaponPatchManager.ReloadConfig();
+                Citrus.SelfParrot(player, "Weapon patches reloaded!");
+            }, pluginName, "Reloads weapon damage multipliers from json", "", 1);
+
+            Citrus.AddCommand("broadcast", delegate (string[] prms, TABGPlayerServer player)
+            {
+                if (prms == null || prms.Length == 0)
+                {
+                    Citrus.SelfParrot(player, "broadcast <message>");
+                    return;
+                }
+
+                string text = string.Join(" ", prms);
+                string msg = "[SERVER] " + text;
+
+                foreach (var pr in Citrus.players)
+                {
+                    if (pr?.player != null)
+                    {
+                        Citrus.SelfParrot(pr.player, msg);
+                    }
+                }
+            }, pluginName, "Sends a message to all players in the game", "<message>", 3);
 
             Citrus.AddCommand("goto", delegate (string[] prms, TABGPlayerServer player)
             {
@@ -651,9 +691,9 @@ namespace CitrusLib
                     }
                 }
 
-                if (!int.TryParse(prms[0],out typ))
+                if (!TryParseItemId(prms[0], out typ))
                 {
-                    Citrus.SelfParrot(player, "invalid item type");
+                    Citrus.SelfParrot(player, "invalid item (use ID or Item enum name)");
                     return;
                 }
 
@@ -667,7 +707,7 @@ namespace CitrusLib
 
 
             }, 
-            pluginName, "gives the user an item with an optional amount", "[id] [amount(optional)]",2);
+            pluginName, "gives the user an item with an optional amount", "[id|ItemName] [amount(optional)]",2);
 
             Citrus.AddCommand("gift", delegate (string[] prms, TABGPlayerServer player)
             {
@@ -705,15 +745,15 @@ namespace CitrusLib
                     }
                 }
 
-                if (!int.TryParse(prms[1], out typ))
+                if (!TryParseItemId(prms[1], out typ))
                 {
-                    Citrus.SelfParrot(player, "invalid item type");
+                    Citrus.SelfParrot(player, "invalid item (use ID or Item enum name)");
                     return;
                 }
 
                 LootPack lp = new LootPack();
                 lp.AddLoot(typ, amt);
-                Citrus.GiveLoot(player, lp);
+                Citrus.GiveLoot(find, lp);
 
                 //Citrus.SelfParrot(player, message);
                 //Citrus.log.Log(message);
@@ -721,7 +761,7 @@ namespace CitrusLib
 
 
             }, 
-            pluginName, "gives the user an item with an optional amount", "<player> [id] [amount(optional)]",2);
+            pluginName, "gives the target player an item with an optional amount", "<player> [id|ItemName] [amount(optional)]",2);
 
 
 
@@ -1174,6 +1214,66 @@ namespace CitrusLib
         }
     }
 
+
+    [HarmonyPatch(typeof(WeaponChangedCommand), nameof(WeaponChangedCommand.Run))]
+    class WeaponChangedPatch
+    {
+        static void Prefix(byte[] msgData)
+        {
+            try
+            {
+                using (MemoryStream input = new MemoryStream(msgData))
+                {
+                    using (BinaryReader binaryReader = new BinaryReader(input))
+                    {
+                        byte playerIndex = binaryReader.ReadByte();
+                        byte slotFlag = binaryReader.ReadByte();
+                        short w1A = binaryReader.ReadInt16(); // Slot 1
+                        short w1B = binaryReader.ReadInt16(); // Slot 1 (dual)
+                        short w2A = binaryReader.ReadInt16(); // Slot 2
+                        short w2B = binaryReader.ReadInt16(); // Slot 2 (dual)
+                        short w3A = binaryReader.ReadInt16(); // Slot 3
+
+                        int currentWeapon = -1;
+                        // slotFlag defines which slot is currently active
+                        if (slotFlag == 0) currentWeapon = w1A;
+                        else if (slotFlag == 1) currentWeapon = w2A;
+                        else if (slotFlag == 2) currentWeapon = w3A;
+
+                        if (Citrus.PlayerActiveWeapons.ContainsKey(playerIndex))
+                            Citrus.PlayerActiveWeapons[playerIndex] = currentWeapon;
+                        else
+                            Citrus.PlayerActiveWeapons.Add(playerIndex, currentWeapon);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Citrus.log.LogError("Error in WeaponChangedPatch: " + e.Message);
+            }
+        }
+    }
+
+        [HarmonyPatch(typeof(TABGPlayerBase), "TakeDamage", new Type[] { typeof(float) })]
+        class DamagePatch
+        {
+            static void Prefix(TABGPlayerBase __instance, ref float dmg)
+            {
+                if (__instance is not TABGPlayerServer victim)
+                    return;
+
+                byte damagerIndex = victim.LastAttacker;
+                if (damagerIndex == byte.MaxValue)
+                    return;
+
+                if (Citrus.PlayerActiveWeapons.TryGetValue(damagerIndex, out int weaponId))
+                {
+                    float multiplier = Citrus.GetWeaponDamageMultiplier(weaponId);
+                    if (multiplier != 1.0f)
+                        dmg *= multiplier;
+                }
+            }
+        }
 
     [HarmonyPatch(typeof(ChatMessageCommand), nameof(ChatMessageCommand.Run))]
     class ChatPatch

@@ -49,6 +49,45 @@ namespace CitrusLib
 
         public static List<UnityTransportServer.BufferedPackage> queue = new List<UnityTransportServer.BufferedPackage>();
 
+        // Weapon Damage Multipliers: WepID -> Multiplier
+        private static Dictionary<int, float> weaponDamageMultipliers = new Dictionary<int, float>();
+
+        // Current Player Weapons: PlayerIndex -> CurrentWeaponID
+        public static Dictionary<byte, int> PlayerActiveWeapons = new Dictionary<byte, int>();
+
+        /// <summary>
+        /// Sets a damage multiplier for a specific weapon ID.
+        /// </summary>
+        public static void SetWeaponDamageMultiplier(int weaponId, float multiplier)
+        {
+            if (weaponDamageMultipliers.ContainsKey(weaponId))
+                weaponDamageMultipliers[weaponId] = multiplier;
+            else
+                weaponDamageMultipliers.Add(weaponId, multiplier);
+        }
+
+        public static float GetWeaponDamageMultiplier(int weaponId)
+        {
+            if (weaponDamageMultipliers.TryGetValue(weaponId, out float mult))
+                return mult;
+            return 1.0f;
+        }
+
+        /// <summary>
+        /// Get the current weapon ID directly from the player object.
+        /// </summary>
+        public static int GetCurrentWeaponID(TABGPlayerServer player)
+        {
+            if (player == null || player.Equipment == null || player.Equipment.Length < 6) return -1;
+            
+            int slotFlag = (int)player.Equipment[5];
+            if (slotFlag == 1) return (int)player.Equipment[0];
+            if (slotFlag == 2) return (int)player.Equipment[2];
+            if (slotFlag == 3) return (int)player.Equipment[4];
+            
+            return -1;
+        }
+
         //send nukes
         public static Dictionary<byte, Queue<UnityTransportServer.BufferedPackage>> buffQueue = new Dictionary<byte, Queue<UnityTransportServer.BufferedPackage>>();
 
