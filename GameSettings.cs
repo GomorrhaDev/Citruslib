@@ -46,7 +46,7 @@ namespace CitrusLib
     /// <typeparam name="T"></typeparam>
     public class SettingsFile<T> where T: SettingObject
     {
-        static CitLog setLog = new CitLog("CitrusLib-Settings", ConsoleColor.Cyan);
+        static Logger setLog = new Logger("CitrusLib-Settings", ConsoleColor.Cyan);
         //public static List<SettingCategory> settings = new List<SettingCategory>();
 
         //public static List<SettingCategory> defaults = new List<SettingCategory>();

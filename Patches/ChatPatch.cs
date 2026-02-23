@@ -7,8 +7,6 @@ using Landfall.Network;
 
 namespace CitrusLib.Patches
 {
-
-
     [HarmonyPatch(typeof(ChatMessageCommand), nameof(ChatMessageCommand.Run))]
     public class ChatPatch
     {
@@ -16,39 +14,51 @@ namespace CitrusLib.Patches
         {
 
             TABGPlayerServer player = Citrus.World.GameRoomReference.FindPlayer(sender);
+
             if (player == null)
             {
+                Citrus.log.LogWarning($"[ChatPatch] Player not found for sender index {sender} — aborting.");
                 return false;
             }
+            
 
-
-            using (MemoryStream memoryStream = new MemoryStream(msgData))
+            try
             {
-                using (BinaryReader binaryReader = new BinaryReader(memoryStream))
+                using (MemoryStream memoryStream = new MemoryStream(msgData))
                 {
-                    byte index = binaryReader.ReadByte();
-                    byte count = binaryReader.ReadByte();
-                    string message = Encoding.Unicode.GetString(binaryReader.ReadBytes((int)count));
-
-                    string[] prms = message.Split(' ');
-
-                    int i = 0;
-                    foreach (string s in prms)
+                    using (BinaryReader binaryReader = new BinaryReader(memoryStream))
                     {
-                        prms[i] = s.ToLower();
-                        i++;
-                    }
+                        byte index = binaryReader.ReadByte();
+                        byte count = binaryReader.ReadByte();
+                        string message = Encoding.Unicode.GetString(binaryReader.ReadBytes((int)count));
+                        
+                        string[] prms = message.Split(' ');
 
+                        for (int i = 0; i < prms.Length; i++)
+                            prms[i] = prms[i].ToLower();
+                        
 
-                    if (prms[0].StartsWith("/"))
-                    {
-                        //runs command and doesnt say it in chat
-                        List<string> prmsReal = prms.ToList();
-                        prmsReal.RemoveAt(0);
-                        Citrus.RunCommand(prms[0].Replace("/", ""), prmsReal.ToArray(), player);
-                        return true;
+                        if (prms[0].StartsWith("/"))
+                        {
+                            string commandName = prms[0].Replace("/", "");
+
+                            List<string> prmsReal = prms.ToList();
+                            prmsReal.RemoveAt(0);
+                            
+                            Citrus.RunCommand(commandName, prmsReal.ToArray(), player);
+                            
+                            return true;
+                        }
+                        else
+                        {
+                            Citrus.log.Log($"[ChatPatch] Not a command, passing through to original.");
+                        }
                     }
                 }
+            }
+            catch (System.Exception e)
+            {
+                Citrus.log.LogError($"[ChatPatch] Exception during message parsing: {e.Message}\n{e.StackTrace}");
             }
 
             return true;

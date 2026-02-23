@@ -215,26 +215,26 @@
             <param name="player"></param>
             <param name="gearData"></param>
         </member>
-        <member name="T:CitrusLib.CitLog">
+        <member name="T:CitrusLib.Logger">
             <summary>
             A Class for prettier debug logging.
             </summary>
         </member>
-        <member name="M:CitrusLib.CitLog.#ctor(System.String,System.ConsoleColor)">
+        <member name="M:CitrusLib.Logger.#ctor(System.String,System.ConsoleColor)">
             <summary>
-            Makes a new CitLog for logging stuff in your mod!
+            Makes a new Logger for logging stuff in your mod!
             </summary>
             <param name="n">The name of your mod, or a sub-name if your mod has multiple seperate parts</param>
             <param name="c">The color of the name.</param>
         </member>
-        <member name="M:CitrusLib.CitLog.Log(System.String,System.Boolean)">
+        <member name="M:CitrusLib.Logger.Log(System.String,System.Boolean)">
             <summary>
             Logs a message to the console
             </summary>
             <param name="text">The message to display</param>
             <param name="error">Whether the message is an error.</param>
         </member>
-        <member name="M:CitrusLib.CitLog.LogError(System.String)">
+        <member name="M:CitrusLib.Logger.LogError(System.String)">
             <summary>
             logs an error to the console.
             </summary>

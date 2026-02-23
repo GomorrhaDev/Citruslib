@@ -13,22 +13,14 @@ namespace CitrusLib
 
         static SettingsFile<PermList> perms;
 
-
         static Dictionary<string, Command> commands = new Dictionary<string, Command>();
 
         public static bool disableMissingCommandParrot = false;
 
         internal static void WriteNewPermList()
         {
-            perms.settings = new List<PermList>()
-            {
-                permList
-            };
-
-
+            perms.settings = new List<PermList>() { permList };
             perms.WriteSettings();
-
-
         }
 
         internal static void LoadPermSettings(string path)
@@ -40,154 +32,118 @@ namespace CitrusLib
                 path = "PlayerPerms";
             }
 
-            
-                //make settings file
-                perms = new SettingsFile<PermList>(path, absolute);
-                //write ALL defaults before reading!!!
+            perms = new SettingsFile<PermList>(path, absolute);
 
-                PermList defaultPermList = new PermList();
-                defaultPermList.name = "players";
-                    defaultPermList.description = "List of players with modified permission level. defafult permission level is 0. commands can have different required permission levels, and the PL of players can even be lowered!";
+            PermList defaultPermList = new PermList();
+            defaultPermList.name = "players";
+            defaultPermList.description = "List of players with modified permission level. Default permission level is 0.";
 
-                PermList.PermPlayer dp = new PermList.PermPlayer();
-                dp.epic = "epic goes here";
-                dp.name = "player name (does not need to be exact!)";
-                dp.permlevel = 1;
+            PermList.PermPlayer dp = new PermList.PermPlayer();
+            dp.epic = "epic goes here";
+            dp.name = "player name (does not need to be exact!)";
+            dp.permlevel = 1;
 
-                defaultPermList.players.Add(dp);
-                defaultPermList.players.Add(dp);
+            defaultPermList.players.Add(dp);
+            defaultPermList.players.Add(dp);
 
-                //perms.AddSetting("Players", SettingsFile.SubJson(defaultPermList), "List of players with modified admin-status or permission level. defafult permission level is 0. some commands can be admin-only, OR require a higher perm level, OR BOTH.");
+            perms.AddSetting(defaultPermList);
+            perms.ReadSettings();
 
-                perms.AddSetting(defaultPermList);
-
-
-                perms.ReadSettings();
-
-                
-                if(perms.TryGetSetting("players",out permList))
-                {
-                    Citrus.log.Log("Player Perm List loaded!");
-                    foreach(PermList.PermPlayer ply in permList.players)
-                    {
-                    Citrus.log.Log(string.Format("{0} ({1}), PermLevel: {2}",ply.name,ply.epic,ply.permlevel));
-                }
-                }
-                else
-                {
-                    Citrus.log.LogError("missing player permission list?");
-                }
-            
+            if (perms.TryGetSetting("players", out permList))
+            {
+                Citrus.log.Log("Player Perm List loaded!");
+                foreach (PermList.PermPlayer ply in permList.players)
+                    Citrus.log.Log($"{ply.name} ({ply.epic}), PermLevel: {ply.permlevel}");
+            }
+            else
+            {
+                Citrus.log.LogError("Missing player permission list!");
+            }
         }
 
         /// <summary>
-        /// aww yeah.
-        /// 
-        /// Adds Chat commands that players, which an appropriate perm level, can execute in-game.
+        /// Adds a chat command that can be triggered by multiple names.
         /// </summary>
-        /// <param name="names">an array of names that would invoke this command</param>
-        /// <param name="function">An action that takes further chat parameters, and the excecuting player, as input. this is where you write what the command does!</param>
-        /// <param name="adminOnly">If the player has to be an Admin to excecute this function. I reccomend using permlevel instead...</param>
-        /// <param name="modName">The name of the mod this command is from. helpful for sorting, when the commands are printed to a file.</param>
-        /// <param name="description">The description of the command, for when it is printed</param>
-        /// <param name="paramDesc">a string example of the parameters used in the function, for printing</param>
         public static void AddCommand(string[] names, Action<string[], TABGPlayerServer> function, string modName = "", string description = "", string paramDesc = "")
         {
-
             foreach (string name in names)
             {
                 AddCommand(name, function, modName, description, paramDesc);
-                paramDesc = "";
+                paramDesc   = "";
                 description = "";
             }
         }
 
-        internal static bool RunCommand(string name, string[] prms, TABGPlayerServer player)
-        {
-            Command cmd = null;
-            if (commands.TryGetValue(name, out cmd))
-            {
-                return cmd.Run(prms, player);
-
-            }
-            else
-            {
-                Citrus.SelfParrot(player, "unknown command: " + name);
-                return false;
-            }
-        }
-
         /// <summary>
-        /// ohh yeah.
-        /// 
-        /// Adds a Chat command that players, which an appropriate perm level, can execut in-game.
+        /// Adds a chat command with a single name.
         /// </summary>
-        /// <param name="name">the name of the command</param>
-        /// <param name="function">An action that takes further chat parameters, and the excecuting player, as input. this is where you write what the command does!</param>
-        /// <param name="adminOnly">If the player has to be an Admin to excecute this function. I reccomend using permlevel instead...</param>
-        /// <param name="modName">The name of the mod this command is from. helpful for sorting, when the commands are printed to a file.</param>
-        /// <param name="description">The description of the command, for when it is printed</param>
-        /// <param name="paramDesc">a string example of the parameters used in the function, for printing</param>
-        /// <param name="permLevel">the required perm level for the command.</param>
         public static void AddCommand(string name, Action<string[], TABGPlayerServer> function, string modName = "", string description = "", string paramDesc = "", int permLevel = 1)
         {
             if (commands.ContainsKey(name))
             {
-                Citrus.log.LogError("command " + name + " already registered by another mod!");
+                Citrus.log.LogError($"Command \"{name}\" is already registered by another mod!");
                 return;
             }
             if (function == null)
             {
-                Citrus.log.LogError("Refusing to register command " + name + " as it has no function!");
+                Citrus.log.LogError($"Refusing to register command \"{name}\" — it has no function!");
                 return;
             }
-            commands.Add(name, new Command(name, function, modName, description, paramDesc,permLevel));
 
-
+            commands.Add(name, new Command(name, function, modName, description, paramDesc, permLevel));
+            Citrus.log.Log($"[Commands] Registered command: \"{name}\" (mod: {modName}, permLevel: {permLevel})");
         }
 
-
-        static int CommandCompare(Command a, Command b)
+        internal static bool RunCommand(string name, string[] prms, TABGPlayerServer player)
         {
-            return a.permLevel.CompareTo(b.permLevel);
+
+            if (commands.TryGetValue(name, out Command cmd))
+            {
+                return cmd.Run(prms, player);
+            }
+            else
+            {
+                Citrus.log.LogWarning($"[Commands] Unknown command: \"{name}\" — registered commands: [{string.Join(", ", commands.Keys)}]");
+
+                if (!disableMissingCommandParrot)
+                    Citrus.SelfParrot(player, "unknown command: " + name);
+
+                return false;
+            }
         }
+
+        static int CommandCompare(Command a, Command b) => a.permLevel.CompareTo(b.permLevel);
 
         internal static void WriteAllCommands()
         {
             string f = "COMMANDS LIST:";
             Citrus.log.Log("Writing Command List to file!");
+
             Dictionary<string, List<Command>> sort = new Dictionary<string, List<Command>>();
-            //sort.Add("General", new List<Command>());
 
             foreach (Command c in commands.Values)
             {
                 string key = c.modName != "" ? c.modName : "Unnamed Commands";
                 if (!sort.ContainsKey(key))
-                {
                     sort.Add(key, new List<Command>());
-
-                }
                 sort[key].Add(c);
-
             }
 
             foreach (List<Command> lc in sort.Values)
             {
                 f += "\n\n";
                 f += "======" + (lc[0].modName != "" ? lc[0].modName : "General\n") + "======";
-
                 lc.Sort(CommandCompare);
-
                 foreach (Command c in lc)
                 {
                     f += "\n\n";
                     f += c.ToString();
                 }
             }
+
             DirectoryInfo directoryInfo = new DirectoryInfo(Application.dataPath);
             string text = Path.Combine(directoryInfo.Parent.FullName, "Commands_List.txt");
             File.WriteAllText(text, f);
-
         }
     }
 
@@ -197,17 +153,14 @@ namespace CitrusLib
     {
         [JsonProperty(Order = 1)]
         public List<PermPlayer> players = new List<PermPlayer>();
+
         [Serializable]
         public class PermPlayer
         {
             public string name;
             public string epic;
-            public int permlevel; // perm level of one sets the player to admin, higher levels allow higher permission access.
-
+            public int permlevel;
         }
-
-
-
     }
 
 
@@ -220,30 +173,21 @@ namespace CitrusLib
         public readonly string modName;
         public readonly int permLevel;
 
-
-
-        public Command(string n, Action<string[], TABGPlayerServer> f, string mName = "", string desc = "", string pDesc = "", int plev=1)
+        public Command(string n, Action<string[], TABGPlayerServer> f, string mName = "", string desc = "", string pDesc = "", int plev = 1)
         {
-            name = n;
-            func = f;
+            name        = n;
+            func        = f;
             description = desc;
-            paramDesc = pDesc;
-            modName = mName;
-            permLevel = plev;
+            paramDesc   = pDesc;
+            modName     = mName;
+            permLevel   = plev;
         }
 
         public override string ToString()
         {
-
-
             string ret = description;
-
-            if (ret != "")
-            {
-                ret += "\n";
-            }
-            ret += string.Format("Perm Level: {0}\n",permLevel);
-
+            if (ret != "") ret += "\n";
+            ret += $"Perm Level: {permLevel}\n";
             ret += "/" + name + " " + paramDesc;
             return ret;
         }
@@ -252,37 +196,33 @@ namespace CitrusLib
         {
             if (player == null)
             {
+                Citrus.log.LogWarning($"[Commands] Command \"{name}\" called with null player — aborting.");
                 return false;
             }
-            
-                
-            
+
             int plev = 0;
+
             if (Citrus.permList != null)
             {
                 PermList.PermPlayer ply = Citrus.permList.players.Find(p => p.epic == player.EpicUserName);
-                if (ply != null)
-                {
-                    plev = ply.permlevel;
-                }
+                if (ply != null) plev = ply.permlevel;
             }
+            else
+            {
+                Citrus.log.LogWarning($"[Commands] permList is null — treating player {player.PlayerName} as perm level 0.");
+            }
+            
             if (plev < permLevel)
             {
-                Citrus.log.Log(string.Format("Player {0} tried to use command {1} but isn't a high enough permission level", player.PlayerName, name));
+                Citrus.log.Log($"[Commands] Player \"{player.PlayerName}\" lacks permission for \"{name}\" (has {plev}, needs {permLevel}).");
                 if (!Citrus.disableMissingCommandParrot)
-                {
-                    Citrus.SelfParrot(player, "Command \"" + name + "\" requires a higher permission level.");
-                }
-                
+                    Citrus.SelfParrot(player, $"Command \"{name}\" requires a higher permission level.");
                 return false;
             }
 
-
-
-            //runs the function!
+            Citrus.log.Log($"[Commands] Executing \"{name}\" for player \"{player.PlayerName}\".");
             func(prms, player);
             return true;
         }
     }
-
 }
