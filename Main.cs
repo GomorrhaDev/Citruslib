@@ -8,7 +8,7 @@ namespace WobbleBridge
     {
         public const string pluginGuid    = "gmrrh.tabg.wobblebridge";
         public const string pluginName    = "WobbleBridge";
-        public const string pluginVersion = "0.1.0";
+        public const string pluginVersion = "0.1.1";
 
         public void Awake()
         {
