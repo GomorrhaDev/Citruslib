@@ -329,9 +329,9 @@ namespace WobbleBridge
             {
                 if (prms == null || prms.Length == 0) { Wobble.SelfParrot(player, "broadcast <message>"); return; }
                 string msg = "[SERVER] " + string.Join(" ", prms);
-                foreach (var pr in Wobble.players)
+                foreach (TABGPlayerServer pl in Wobble.World.GameRoomReference.Players)
                 {
-                    if (pr?.player != null) Wobble.SelfParrot(pr.player, msg);
+                    if (pl != null) Wobble.SelfParrot(pl, msg);
                 }
             },
             "Wobble Lib", "Sends a message to all players in the game", "<message>", 3);
