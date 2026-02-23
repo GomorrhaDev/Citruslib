@@ -5,7 +5,7 @@ using System.Text;
 using HarmonyLib;
 using Landfall.Network;
 
-namespace CitrusLib.Patches
+namespace WobbleBridge.Patches
 {
     [HarmonyPatch(typeof(ChatMessageCommand), nameof(ChatMessageCommand.Run))]
     public class ChatPatch
@@ -13,11 +13,11 @@ namespace CitrusLib.Patches
         static bool Prefix(byte[] msgData, ServerClient world, byte sender)
         {
 
-            TABGPlayerServer player = Citrus.World.GameRoomReference.FindPlayer(sender);
+            TABGPlayerServer player = Wobble.World.GameRoomReference.FindPlayer(sender);
 
             if (player == null)
             {
-                Citrus.log.LogWarning($"[ChatPatch] Player not found for sender index {sender} — aborting.");
+                Wobble.log.LogWarning($"[ChatPatch] Player not found for sender index {sender} — aborting.");
                 return false;
             }
             
@@ -45,20 +45,20 @@ namespace CitrusLib.Patches
                             List<string> prmsReal = prms.ToList();
                             prmsReal.RemoveAt(0);
                             
-                            Citrus.RunCommand(commandName, prmsReal.ToArray(), player);
+                            Wobble.RunCommand(commandName, prmsReal.ToArray(), player);
                             
                             return true;
                         }
                         else
                         {
-                            Citrus.log.Log($"[ChatPatch] Not a command, passing through to original.");
+                            Wobble.log.Log($"[ChatPatch] Not a command, passing through to original.");
                         }
                     }
                 }
             }
             catch (System.Exception e)
             {
-                Citrus.log.LogError($"[ChatPatch] Exception during message parsing: {e.Message}\n{e.StackTrace}");
+                Wobble.log.LogError($"[ChatPatch] Exception during message parsing: {e.Message}\n{e.StackTrace}");
             }
 
             return true;

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Epic.OnlineServices.Auth;
 using HarmonyLib;
@@ -7,7 +6,7 @@ using Landfall.Network;
 using Unity.Collections;
 using Unity.Networking.Transport;
 
-namespace CitrusLib.Patches
+namespace WobbleBridge.Patches
 {
     // required for kicking players properly. dont ask why.
     [HarmonyPatch(typeof(PlayerUpdateCommand), nameof(PlayerUpdateCommand.Run))]
@@ -21,7 +20,7 @@ namespace CitrusLib.Patches
                 {
                     byte ind = binaryReader.ReadByte();
 
-                    PlayerRef p = Citrus.players.Find(pr => pr.player.PlayerIndex == ind);
+                    PlayerRef p = Wobble.players.Find(pr => pr.player.PlayerIndex == ind);
 
                     if (p == null)
                     {
@@ -44,26 +43,26 @@ namespace CitrusLib.Patches
         static void Prefix(ref BidirectionalDictionary<byte, NetworkConnection> ___m_playerIDToConnection, UnityTransportServer __instance, ref NativeList<NetworkConnection> ___m_connections)
         {
             // apparent naitivelists are special and cannot be compared to null?
-            if (Citrus.kicklist != null & ___m_playerIDToConnection != null)
+            if (Wobble.kicklist != null & ___m_playerIDToConnection != null)
             {
-                while (Citrus.kicklist.Count != 0)
+                while (Wobble.kicklist.Count != 0)
                 {
-                    byte pb = Citrus.kicklist.Dequeue();
+                    byte pb = Wobble.kicklist.Dequeue();
                     NetworkConnection nc;
                     if (!___m_playerIDToConnection.TryGetValue(pb, out nc))
                     {
-                        Citrus.log.LogError(string.Format("Failed to find connection fo player ID: {0}", pb));
+                        Wobble.log.LogError(string.Format("Failed to find connection fo player ID: {0}", pb));
                         continue;
                     }
                     // please work please work please work
                     int j = ___m_connections.IndexOf(nc);
                     ___m_playerIDToConnection.Remove(___m_connections[j]);
-                    Citrus.log.Log(string.Format("Client: {0} disconnected from server", ___m_connections[j].InternalId));
+                    Wobble.log.Log(string.Format("Client: {0} disconnected from server", ___m_connections[j].InternalId));
                     ___m_connections[j] = default(NetworkConnection);
-                    TABGPlayerServer tabgplayerServer = Citrus.World.GameRoomReference.FindPlayer(pb);
+                    TABGPlayerServer tabgplayerServer = Wobble.World.GameRoomReference.FindPlayer(pb);
                     if (tabgplayerServer != null)
                     {
-                        Citrus.World.HandlePlayerLeave(tabgplayerServer);
+                        Wobble.World.HandlePlayerLeave(tabgplayerServer);
                     }
                 }
             }
@@ -94,27 +93,27 @@ namespace CitrusLib.Patches
     {
         static void Postfix(TABGPlayerServer p, bool wantsToBeAlone)
         {
-            if (Citrus.players.Find(pr => pr.player.PlayerIndex == p.PlayerIndex) != null)
+            if (Wobble.players.Find(pr => pr.player.PlayerIndex == p.PlayerIndex) != null)
             {
                 return;
             }
 
             PlayerRef pRef = new PlayerRef(p);
 
-            if (Citrus.players == null)
+            if (Wobble.players == null)
             {
-                Citrus.log.Log("player list is null?");
-                Citrus.players = new List<PlayerRef>();
+                Wobble.log.Log("player list is null?");
+                Wobble.players = new List<PlayerRef>();
             }
 
-            Citrus.players.Add(pRef);
+            Wobble.players.Add(pRef);
 
-            PlayerTeam myTeam = Citrus.teams.Find(t => t.groupIndex == p.GroupIndex);
+            PlayerTeam myTeam = Wobble.teams.Find(t => t.groupIndex == p.GroupIndex);
 
             if (myTeam == null)
             {
                 myTeam = new PlayerTeam(p.GroupIndex);
-                Citrus.teams.Add(myTeam);
+                Wobble.teams.Add(myTeam);
             }
             myTeam.players.Add(pRef);
         }
@@ -131,18 +130,18 @@ namespace CitrusLib.Patches
                 return;
             }
 
-            PlayerRef player = Citrus.players.Find(pl => pl.player == p);
+            PlayerRef player = Wobble.players.Find(pl => pl.player == p);
 
             if (player == null) return;
 
-            PlayerTeam team = Citrus.teams.Find(t => t.players.Contains(player));
+            PlayerTeam team = Wobble.teams.Find(t => t.players.Contains(player));
 
             if (team != null)
             {
                 team.players.Remove(player);
                 return;
             }
-            Citrus.players.Remove(player);
+            Wobble.players.Remove(player);
         }
     }
 }

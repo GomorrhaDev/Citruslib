@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using Landfall.Network;
-using UnityEngine;
 using Newtonsoft.Json;
+using UnityEngine;
 
-namespace CitrusLib
+namespace WobbleBridge
 {
-    public static partial class Citrus
+    public static partial class Wobble
     {
         internal static PermList permList;
 
@@ -51,13 +51,13 @@ namespace CitrusLib
 
             if (perms.TryGetSetting("players", out permList))
             {
-                Citrus.log.Log("Player Perm List loaded!");
+                log.Log("Player Perm List loaded!");
                 foreach (PermList.PermPlayer ply in permList.players)
-                    Citrus.log.Log($"{ply.name} ({ply.epic}), PermLevel: {ply.permlevel}");
+                    log.Log($"{ply.name} ({ply.epic}), PermLevel: {ply.permlevel}");
             }
             else
             {
-                Citrus.log.LogError("Missing player permission list!");
+                log.LogError("Missing player permission list!");
             }
         }
 
@@ -81,17 +81,17 @@ namespace CitrusLib
         {
             if (commands.ContainsKey(name))
             {
-                Citrus.log.LogError($"Command \"{name}\" is already registered by another mod!");
+                log.LogError($"Command \"{name}\" is already registered by another mod!");
                 return;
             }
             if (function == null)
             {
-                Citrus.log.LogError($"Refusing to register command \"{name}\" — it has no function!");
+                log.LogError($"Refusing to register command \"{name}\" — it has no function!");
                 return;
             }
 
             commands.Add(name, new Command(name, function, modName, description, paramDesc, permLevel));
-            Citrus.log.Log($"[Commands] Registered command: \"{name}\" (mod: {modName}, permLevel: {permLevel})");
+            log.Log($"[Commands] Registered command: \"{name}\" (mod: {modName}, permLevel: {permLevel})");
         }
 
         internal static bool RunCommand(string name, string[] prms, TABGPlayerServer player)
@@ -103,10 +103,10 @@ namespace CitrusLib
             }
             else
             {
-                Citrus.log.LogWarning($"[Commands] Unknown command: \"{name}\" — registered commands: [{string.Join(", ", commands.Keys)}]");
+                log.LogWarning($"[Commands] Unknown command: \"{name}\" — registered commands: [{string.Join(", ", commands.Keys)}]");
 
                 if (!disableMissingCommandParrot)
-                    Citrus.SelfParrot(player, "unknown command: " + name);
+                    SelfParrot(player, "unknown command: " + name);
 
                 return false;
             }
@@ -117,7 +117,7 @@ namespace CitrusLib
         internal static void WriteAllCommands()
         {
             string f = "COMMANDS LIST:";
-            Citrus.log.Log("Writing Command List to file!");
+            log.Log("Writing Command List to file!");
 
             Dictionary<string, List<Command>> sort = new Dictionary<string, List<Command>>();
 
@@ -196,31 +196,31 @@ namespace CitrusLib
         {
             if (player == null)
             {
-                Citrus.log.LogWarning($"[Commands] Command \"{name}\" called with null player — aborting.");
+                Wobble.log.LogWarning($"[Commands] Command \"{name}\" called with null player — aborting.");
                 return false;
             }
 
             int plev = 0;
 
-            if (Citrus.permList != null)
+            if (Wobble.permList != null)
             {
-                PermList.PermPlayer ply = Citrus.permList.players.Find(p => p.epic == player.EpicUserName);
+                PermList.PermPlayer ply = Wobble.permList.players.Find(p => p.epic == player.EpicUserName);
                 if (ply != null) plev = ply.permlevel;
             }
             else
             {
-                Citrus.log.LogWarning($"[Commands] permList is null — treating player {player.PlayerName} as perm level 0.");
+                Wobble.log.LogWarning($"[Commands] permList is null — treating player {player.PlayerName} as perm level 0.");
             }
             
             if (plev < permLevel)
             {
-                Citrus.log.Log($"[Commands] Player \"{player.PlayerName}\" lacks permission for \"{name}\" (has {plev}, needs {permLevel}).");
-                if (!Citrus.disableMissingCommandParrot)
-                    Citrus.SelfParrot(player, $"Command \"{name}\" requires a higher permission level.");
+                Wobble.log.Log($"[Commands] Player \"{player.PlayerName}\" lacks permission for \"{name}\" (has {plev}, needs {permLevel}).");
+                if (!Wobble.disableMissingCommandParrot)
+                    Wobble.SelfParrot(player, $"Command \"{name}\" requires a higher permission level.");
                 return false;
             }
 
-            Citrus.log.Log($"[Commands] Executing \"{name}\" for player \"{player.PlayerName}\".");
+            Wobble.log.Log($"[Commands] Executing \"{name}\" for player \"{player.PlayerName}\".");
             func(prms, player);
             return true;
         }

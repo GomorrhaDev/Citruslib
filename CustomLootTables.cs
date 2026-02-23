@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using UnityEngine;
 
-namespace CitrusLib
+namespace WobbleBridge
 {
     class CustomLootTables
     {
@@ -29,9 +29,9 @@ namespace CitrusLib
                 {
                     GameSetting g;
 
-                    if (!Citrus.ExtraSettings.TryGetSetting(LOOTTABLEKEY, out g))
+                    if (!Wobble.ExtraSettings.TryGetSetting(LOOTTABLEKEY, out g))
                     {
-                        Citrus.log.LogError("filepath setting for loottables is missing!");
+                        Wobble.log.LogError("filepath setting for loottables is missing!");
                     }
 
                     string res = g.value;
@@ -69,7 +69,7 @@ namespace CitrusLib
         //register settings
         internal static void Register()
         {
-            Citrus.ExtraSettings.AddSetting(new GameSetting()
+            Wobble.ExtraSettings.AddSetting(new GameSetting()
             {
                 name = LOOTTABLEKEY,
                 description = "The FOLDER that will hold a loottables FOLDER inside of it, which, in turn, will hold the customizable loot tables. LEAVE BLANK for a local folder",
@@ -84,10 +84,10 @@ namespace CitrusLib
         public static void ReadLoot()
         {
 
-            Citrus.log.Log("Reading Loot Table Files at "+ path);
+            Wobble.log.Log("Reading Loot Table Files at "+ path);
             if (!Directory.Exists(path))
             {
-                Citrus.log.Log("creating loot folder");
+                Wobble.log.Log("creating loot folder");
                 Directory.CreateDirectory(path);
             }
 
@@ -100,7 +100,7 @@ namespace CitrusLib
             if (names.Count == 0)
             {
                 //darn...
-                Citrus.log.Log("no json files in the filepath folder! adding defaults");
+                Wobble.log.Log("no json files in the filepath folder! adding defaults");
                 CreateDefaultLoot();
                 
             }
@@ -109,7 +109,7 @@ namespace CitrusLib
 
             foreach (string data in names.ConvertAll((s)=>
             {
-                Citrus.log.Log( Path.GetFileName(s));
+                Wobble.log.Log( Path.GetFileName(s));
                 return File.ReadAllText(s); //so cool
             }))
             {
@@ -125,7 +125,7 @@ namespace CitrusLib
         {
             if(LootTables == null)
             {
-                Citrus.log.Log("huh. randommatchmod is called before gamestart? loading loottables early then!");
+                Wobble.log.Log("huh. randommatchmod is called before gamestart? loading loottables early then!");
                 ReadLoot();
             }
 
@@ -133,7 +133,7 @@ namespace CitrusLib
 
             if (LootTables.Count() == 0)
             {
-                Citrus.log.LogError("no loot table, still???");
+                Wobble.log.LogError("no loot table, still???");
                 return null;
             }
 
@@ -265,7 +265,7 @@ namespace CitrusLib
 
             if(ent == null)
             {
-                Citrus.log.LogError(string.Format("invalid pickup id {0} when generating loot table!",id));
+                Wobble.log.LogError(string.Format("invalid pickup id {0} when generating loot table!",id));
             }
 
             return ent.gameObject;*/ //i think this is okay. i hope this is okay.
@@ -276,7 +276,7 @@ namespace CitrusLib
         {
             List<LootTable> loots = new List<LootTable>();
 
-           // Citrus.log.Log("1");
+           // Wobble.log.Log("1");
             //im not sure if this list ALSO needs to be altered/ovverwritten
             TABGLootPresetDatabase.Instance.GetAllLootPresets();
 
@@ -328,14 +328,14 @@ namespace CitrusLib
 
         static void WriteAllLootTables()
         {
-            Citrus.log.Log("Writing all loot tables!");
+            Wobble.log.Log("Writing all loot tables!");
 
             foreach (LootTable t in LootTables)
             {
                 File.WriteAllText(path+"/"+t.name+".json", JsonConvert.SerializeObject(t, Formatting.Indented));
             }
 
-            Citrus.log.Log("hooray!");
+            Wobble.log.Log("hooray!");
         }
 
         //secretly, its a mixup of the Matchmodifer and 

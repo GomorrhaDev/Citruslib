@@ -1,13 +1,13 @@
 ﻿using System;
 using UnityEngine;
 
-namespace CitrusLib
+namespace WobbleBridge
 {
     // Logging changes and stuff
-    public static partial class Citrus
+    public static partial class Wobble
     {
-        // Internal logger for CitrusLib debugging — don't use this, make your own Logger!
-        internal static Logger log = new Logger("CitrusLib", ConsoleColor.Cyan);
+        // Internal logger for WobbleBridge debugging — don't use this, make your own Logger!
+        internal static Logger log = new Logger("WobbleBridge", ConsoleColor.Cyan);
 
         internal static bool landLogSupressed = false;
 
@@ -57,7 +57,7 @@ namespace CitrusLib
 
         private void Write(string text, ConsoleColor textColor, bool error = false, bool warning = false)
         {
-            if (this == Citrus.landLog && Citrus.landLogSupressed)
+            if (this == Wobble.landLog && Wobble.landLogSupressed)
                 return;
 
             if (Compare(text, lastMessage) / Mathf.Max(1f, Mathf.Max(text.Length, lastMessage.Length)) < 0.15f)

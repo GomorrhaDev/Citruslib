@@ -1,24 +1,24 @@
-﻿namespace CitrusLib
+﻿namespace WobbleBridge
 {
     public static class SettingsRegistry
     {
         public static void Register()
         {
-            Citrus.ExtraSettings.AddSetting(new GameSetting
+            Wobble.ExtraSettings.AddSetting(new GameSetting
             {
                 name = "Suppress Landlog",
                 value = false.ToString(),
                 description = "Prevents most landfall debug messages from being written."
             });
 
-            Citrus.ExtraSettings.AddSetting(new GameSetting
+            Wobble.ExtraSettings.AddSetting(new GameSetting
             {
                 name = "Disable Missing Command Parrot",
                 value = false.ToString(),
                 description = "Disables the unknown command parrot response when tryping an unknown command"
             });
 
-            Citrus.ExtraSettings.AddSetting(new GameSetting
+            Wobble.ExtraSettings.AddSetting(new GameSetting
             {
                 name = "AdminFileLocation",
                 value = "",

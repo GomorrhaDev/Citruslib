@@ -3,7 +3,7 @@ using System.IO;
 using HarmonyLib;
 using Landfall.Network;
 
-namespace CitrusLib.Patches
+namespace WobbleBridge.Patches
 {
 
     [HarmonyPatch(typeof(WeaponChangedCommand), nameof(WeaponChangedCommand.Run))]
@@ -31,16 +31,16 @@ namespace CitrusLib.Patches
                         else if (slotFlag == 1) currentWeapon = w2A;
                         else if (slotFlag == 2) currentWeapon = w3A;
 
-                        if (Citrus.PlayerActiveWeapons.ContainsKey(playerIndex))
-                            Citrus.PlayerActiveWeapons[playerIndex] = currentWeapon;
+                        if (Wobble.PlayerActiveWeapons.ContainsKey(playerIndex))
+                            Wobble.PlayerActiveWeapons[playerIndex] = currentWeapon;
                         else
-                            Citrus.PlayerActiveWeapons.Add(playerIndex, currentWeapon);
+                            Wobble.PlayerActiveWeapons.Add(playerIndex, currentWeapon);
                     }
                 }
             }
             catch (Exception e)
             {
-                Citrus.log.LogError("Error in WeaponChangedPatch: " + e.Message);
+                Wobble.log.LogError("Error in WeaponChangedPatch: " + e.Message);
             }
         }
     }

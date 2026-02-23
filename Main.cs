@@ -1,18 +1,18 @@
 ﻿using BepInEx;
 using HarmonyLib;
 
-namespace CitrusLib
+namespace WobbleBridge
 {
     [BepInPlugin(pluginGuid, pluginName, pluginVersion)]
     public class Main : BaseUnityPlugin
     {
-        public const string pluginGuid    = "citrusbird.tabg.citruslib";
-        public const string pluginName    = "Citrus Lib";
-        public const string pluginVersion = "0.7";
+        public const string pluginGuid    = "gmrrh.tabg.wobblebridge";
+        public const string pluginName    = "WobbleBridge";
+        public const string pluginVersion = "1.0.0";
 
         public void Awake()
         {
-            Citrus.log.Log($"{pluginName} {pluginVersion} Loading!");
+            Wobble.log.Log($"{pluginName} {pluginVersion} Loading!");
 
             new Harmony(pluginGuid).PatchAll();
             

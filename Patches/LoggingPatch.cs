@@ -1,7 +1,7 @@
 ﻿using System;
 using HarmonyLib;
 
-namespace CitrusLib.Patches
+namespace WobbleBridge.Patches
 {
     // praying
     [HarmonyPatch(typeof(LandLog), nameof(LandLog.Log), new Type[] { typeof(string), typeof(object) })]
@@ -9,7 +9,7 @@ namespace CitrusLib.Patches
     {
         static bool Prefix(string logMessage, object context)
         {
-            Citrus.landLog.Log(logMessage);
+            Wobble.landLog.Log(logMessage);
             return false;
         }
     }
@@ -19,7 +19,7 @@ namespace CitrusLib.Patches
     {
         static bool Prefix(string logMessage, object context)
         {
-            Citrus.landLog.LogError(logMessage);
+            Wobble.landLog.LogError(logMessage);
             return false;
         }
     }

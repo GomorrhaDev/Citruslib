@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace CitrusLib.Patches
+namespace WobbleBridge.Patches
 {
     [HarmonyPatch(typeof(TABGLootPresetDatabase), "GetAllLootPresets")]
     class LootTableGetPatch

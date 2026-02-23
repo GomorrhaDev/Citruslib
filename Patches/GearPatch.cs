@@ -2,7 +2,7 @@
 using HarmonyLib;
 using Landfall.Network;
 
-namespace CitrusLib.Patches
+namespace WobbleBridge.Patches
 {
     
 //prevents players from setting their gear every time they spawn. allows opposing-clientsided gear changing

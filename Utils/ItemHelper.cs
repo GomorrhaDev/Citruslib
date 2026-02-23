@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CitrusLib
+namespace WobbleBridge.Utils
 {
     public static class ItemHelper
     {
@@ -11,11 +11,6 @@ namespace CitrusLib
             if (Enum.TryParse<Item>(input, true, out var item))
             {
                 id = (int)item;
-                return true;
-            }
-            if (!string.IsNullOrEmpty(input) && input[0] != '_' && Enum.TryParse<Item>("_" + input, true, out var underscored))
-            {
-                id = (int)underscored;
                 return true;
             }
             return false;

@@ -2,7 +2,7 @@
 using HarmonyLib;
 using Landfall.Network;
 
-namespace CitrusLib.Patches
+namespace WobbleBridge.Patches
 {
 
 
@@ -21,7 +21,7 @@ namespace CitrusLib.Patches
             {
                 foreach (byte b in recipents)
                 {
-                    Citrus.World.SendMessageToClients(opCode, buffer, b, reliable, false); //haha! saved the world!
+                    Wobble.World.SendMessageToClients(opCode, buffer, b, reliable, false); //haha! saved the world!
                 }
 
                 return false;
@@ -30,15 +30,15 @@ namespace CitrusLib.Patches
             {
                 if (recipents.Length == 0)
                 {
-                    Citrus.log.LogError("Sending message to no recipient???");
+                    Wobble.log.LogError("Sending message to no recipient???");
                     return false;
                 }
 
                 if (recipents[0] == byte.MaxValue)
                 {
-                    foreach (TABGPlayerServer p in Citrus.World.GameRoomReference.Players)
+                    foreach (TABGPlayerServer p in Wobble.World.GameRoomReference.Players)
                     {
-                        Citrus.World.SendMessageToClients(opCode, buffer, p.PlayerIndex, reliable, false);
+                        Wobble.World.SendMessageToClients(opCode, buffer, p.PlayerIndex, reliable, false);
                     }
 
                     return false;

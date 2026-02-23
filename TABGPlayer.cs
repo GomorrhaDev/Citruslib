@@ -1,16 +1,16 @@
-﻿using Landfall.Network;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using UnityEngine;
 using Epic.OnlineServices.AntiCheatCommon;
+using Landfall.Network;
+using UnityEngine;
 
-namespace CitrusLib
+namespace WobbleBridge
 {
     //do stuff to players
-    public static partial class Citrus
+    public static partial class Wobble
     {
 
 
@@ -109,7 +109,7 @@ namespace CitrusLib
         {
             if (player == null)
             {
-                Citrus.log.LogError("Cant Find victim player that is dead");
+                log.LogError("Cant Find victim player that is dead");
                 return;
             }
             player.Kill();
@@ -120,7 +120,7 @@ namespace CitrusLib
             {
                 killer.AddKill();
                 byte groupIndex = killer.GroupIndex;
-                Citrus.World.GameRoomReference.CurrentGameKills.AddKillForTeam(groupIndex);
+                Wobble.World.GameRoomReference.CurrentGameKills.AddKillForTeam(groupIndex);
             }
 
             byte killid = killer == null ? byte.MaxValue : killer.PlayerIndex;
@@ -148,7 +148,7 @@ namespace CitrusLib
                     binaryWriter.Write(false);
                 }
             }
-            Citrus.World.SendMessageToClients(EventCode.PlayerDead, buffer, byte.MaxValue, true, false);
+            Wobble.World.SendMessageToClients(EventCode.PlayerDead, buffer, byte.MaxValue, true, false);
 
             
 
@@ -205,7 +205,7 @@ namespace CitrusLib
         /// GIVES one stack of an item to a player
         /// </summary>
         /// <param name="player">The player to affect</param>
-        /// <param name="item">The item id. use the CitLib Item enumerator!</param>
+        /// <param name="item">The item id. use the WobbleBridge Item enumerator!</param>
         /// <param name="quantity">Amount of the item to give</param>
         public static void GiveLoot(TABGPlayerServer player, int item, int quantity = 1)
         {
@@ -213,15 +213,28 @@ namespace CitrusLib
             LootPack lp = new LootPack();
             lp.AddLoot(item, quantity);
             lp.GiveTo(player);
-
-            //GivePickUpCommand.Run(null, Citrus.World, player.PlayerIndex, weps, quants.ToArray());
+            
+        }
+        
+        /// <summary>
+        /// GIVES one stack of an item to a player
+        /// </summary>
+        /// <param name="player">The player to affect</param>
+        /// <param name="item">The item name. use the WobbleBridge Item enumerator!</param>
+        /// <param name="quantity">Amount of the item to give</param>
+        public static void GiveLoot(TABGPlayerServer player, string itemName, int quantity = 1)
+        {
+            if (WobbleBridge.Utils.ItemHelper.TryParseItemId(itemName, out int id))
+            {
+                GiveLoot(player, id, quantity);
+            }
         }
 
         /// <summary>
         /// Gives a LootPack of items to a player
         /// </summary>
         /// <param name="player">the player to affect</param>
-        /// <param name="lp">The CitLib LootPack</param>
+        /// <param name="lp">The WobbleBridge LootPack</param>
         public static void GiveLoot(TABGPlayerServer player, LootPack lp)
         {
             lp.GiveTo(player);
@@ -240,16 +253,16 @@ namespace CitrusLib
         {
             if (player == null)
             {
-                Citrus.log.LogError("tried kicking null player?");
+                log.LogError("tried kicking null player?");
             }
             if (logReason != "")
             {
-                Citrus.log.Log(string.Format("kicking player {0}, Ind:{1}, Epic:{2}, for reason: {3}", player.PlayerName, player.PlayerIndex, player.EpicUserName, logReason));
+                log.Log(string.Format("kicking player {0}, Ind:{1}, Epic:{2}, for reason: {3}", player.PlayerName, player.PlayerIndex, player.EpicUserName, logReason));
             }
 
 
 
-            Citrus.World.SendMessageToClients(EventCode.KickPlayerMessage, new byte[] { (byte)Mathf.Clamp((int)reason+100,byte.MinValue, byte.MaxValue)}, player.PlayerIndex, true, false);
+            Wobble.World.SendMessageToClients(EventCode.KickPlayerMessage, new byte[] { (byte)Mathf.Clamp((int)reason+100,byte.MinValue, byte.MaxValue)}, player.PlayerIndex, true, false);
             //world.HandlePlayerLeave(player);
             //PlayerLeaveCommand.Run(world, player, true);
 
@@ -257,23 +270,23 @@ namespace CitrusLib
 
             byte b = player.PlayerIndex;
             //int id = ((UnityTransportServer)(world.Server)).
-            Citrus.World.SendMessageToClients(EventCode.PlayerLeft, new byte[]
+            Wobble.World.SendMessageToClients(EventCode.PlayerLeft, new byte[]
             {
                 player.PlayerIndex,
                 1
             }, byte.MaxValue, true, false);
 
-            Citrus.World.GameRoomReference.RemovePlayer(player);
-            Citrus.World.GameRoomReference.CurrentGameMode.HandlePlayerLeave(player);
+            Wobble.World.GameRoomReference.RemovePlayer(player);
+            Wobble.World.GameRoomReference.CurrentGameMode.HandlePlayerLeave(player);
 
-            Citrus.World.GameRoomReference.CheckGameState();
-            Citrus.World.Server.DisconnectPlayer(b);
+            Wobble.World.GameRoomReference.CheckGameState();
+            Wobble.World.Server.DisconnectPlayer(b);
             //this all works well enough so far but 
 
 
-            Citrus.log.Log("kicklist enqueue " + b);
-            Citrus.kicklist.Enqueue(b);
-            Citrus.World.Server.Update();//maybe???????
+            log.Log("kicklist enqueue " + b);
+            Wobble.kicklist.Enqueue(b);
+            Wobble.World.Server.Update();//maybe???????
                                          //Network.Disconnect();
 
 
@@ -331,10 +344,10 @@ namespace CitrusLib
 
         static void RebuildStandings()
         {
-            GameStats stats = Citrus.World.GameRoomReference.CurrentGameStats;
+            GameStats stats = Wobble.World.GameRoomReference.CurrentGameStats;
             stats.Reset();
 
-            foreach (TABGPlayerServer player in Citrus.World.GameRoomReference.Players)
+            foreach (TABGPlayerServer player in Wobble.World.GameRoomReference.Players)
             {
                 stats.AddPlayerToTeam(player.GroupIndex, player, true);
             }
@@ -355,17 +368,17 @@ namespace CitrusLib
         /// <param name="groupIndex"></param>
         public static void SetTeam(TABGPlayerServer p, byte groupIndex)
         {
-            PlayerRef player = Citrus.players.Find(pl => pl.player == p);
+            PlayerRef player = Wobble.players.Find(pl => pl.player == p);
             if (player == null)
             {
-                Citrus.log.LogError("player ref not found...");
+                log.LogError("player ref not found...");
                 return;
             }
-            PlayerTeam teamto = Citrus.teams.Find(t => t.groupIndex == groupIndex);
+            PlayerTeam teamto = Wobble.teams.Find(t => t.groupIndex == groupIndex);
 
             if (teamto == null)
             {
-                Citrus.log.Log("team not found");
+                log.Log("team not found");
                 return;
             }
             SetTeam(player, teamto); //oh
@@ -376,7 +389,7 @@ namespace CitrusLib
 
 
         /// <summary>
-        /// tries to set a player's team. this function uses Citlib PlayerRefs and PlayerTeam objects, which might not be easier for you to use than vanilla ids and bytes in the function above.
+        /// tries to set a player's team. this function uses WobbleBridge PlayerRefs and PlayerTeam objects, which might not be easier for you to use than vanilla ids and bytes in the function above.
         /// </summary>
         /// <param name="player"></param>
         /// <param name="team"></param>
@@ -384,22 +397,22 @@ namespace CitrusLib
         {
             //players = players.Distinct().ToList();
 
-            foreach (PlayerRef pref in Citrus.players)
+            foreach (PlayerRef pref in Wobble.players)
             {
-                Citrus.log.Log(pref.player.PlayerIndex + " : " + pref.player.PlayerName);
+                log.Log(pref.player.PlayerIndex + " : " + pref.player.PlayerName);
             }
 
             if (team != null)
             {
                 if (team.players.Contains(player))
                 {
-                    Citrus.log.Log("already on team " + team.groupIndex + ", returning");
+                    log.Log("already on team " + team.groupIndex + ", returning");
                     return; //already on team, shouldnt waste bandwidth
                 }
             }
 
             //remove existing alliances
-            PlayerTeam currentTeam = Citrus.teams.Find(t => t.players.Contains(player));
+            PlayerTeam currentTeam = Wobble.teams.Find(t => t.players.Contains(player));
             if (currentTeam != null)
             {
                 currentTeam.players = currentTeam.players.Distinct().ToList();
@@ -416,12 +429,12 @@ namespace CitrusLib
             }
             else
             {
-                Citrus.log.Log("setting null team can have issues if the players original GI is a still-existing team");
+                log.Log("setting null team can have issues if the players original GI is a still-existing team");
                 player.player.UpdateGroupIndex(player.Get<byte>("originalTeam"));
             }
 
             //might not work....
-            foreach (PlayerRef pl in Citrus.players)
+            foreach (PlayerRef pl in Wobble.players)
             {
                 if (pl == player) continue;
                 SetAlly(player, pl, player.player.GroupIndex == pl.player.GroupIndex);
@@ -440,22 +453,22 @@ namespace CitrusLib
 
             byte plIndex = player.player.PlayerIndex;
             byte index = ally.player.PlayerIndex;
-            Citrus.log.Log(string.Format("Setting player {0} and {1} to be {2}!", plIndex, index, onTeam ? "friends" : "enemies"));
+            log.Log(string.Format("Setting player {0} and {1} to be {2}!", plIndex, index, onTeam ? "friends" : "enemies"));
             byte pgi = player.Get<byte>("originalTeam");
             byte agi = ally.Get<byte>("originalTeam");
 
             int t = onTeam ? 0 : 1;
 
             //player leaves ally's game
-            Citrus.World.SendMessageToClients(EventCode.PlayerLeft, new byte[] { plIndex, (byte)1 }, index, true);
+            Wobble.World.SendMessageToClients(EventCode.PlayerLeft, new byte[] { plIndex, (byte)1 }, index, true);
             //ally leaves player's game
-            Citrus.World.SendMessageToClients(EventCode.PlayerLeft, new byte[] { index, (byte)1 }, plIndex, true);
+            Wobble.World.SendMessageToClients(EventCode.PlayerLeft, new byte[] { index, (byte)1 }, plIndex, true);
 
 
             //player joins ally's game with ally's GI or GI+1 if enemy
-            Citrus.World.SendMessageToClients(EventCode.Login, LoginData(player.player, (byte)((int)agi + t)), index, true);
+            Wobble.World.SendMessageToClients(EventCode.Login, LoginData(player.player, (byte)((int)agi + t)), index, true);
             //ally joins player's game with player's groupindex, or GI+1 if enemy
-            Citrus.World.SendMessageToClients(EventCode.Login, LoginData(ally.player, (byte)((int)pgi + t)), plIndex, true);
+            Wobble.World.SendMessageToClients(EventCode.Login, LoginData(ally.player, (byte)((int)pgi + t)), plIndex, true);
 
         }
 
@@ -500,7 +513,7 @@ namespace CitrusLib
                     binaryWriter.Write(array2);
                 }
             }
-            Citrus.World.SendMessageToClients(EventCode.ThrowChatMessage, buffer, p.PlayerIndex, true, false);
+            Wobble.World.SendMessageToClients(EventCode.ThrowChatMessage, buffer, p.PlayerIndex, true, false);
         }
 
         
@@ -515,12 +528,12 @@ namespace CitrusLib
             //if i remember correctly...
             int ind = player.PlayerIndex;
             //player who's gear is changing leaves game for everyone else
-            Citrus.World.SendMessageToClients(EventCode.PlayerLeft, new byte[] { player.PlayerIndex, (byte)1 }, AllExcept(ind), true);
+            Wobble.World.SendMessageToClients(EventCode.PlayerLeft, new byte[] { player.PlayerIndex, (byte)1 }, AllExcept(ind), true);
 
             //it's possible a delay here is needed / extremely useful, but a long delay will hide the player for longer and possibly cause deadlier bugs
 
             //player "joins back" with new gear. teeny tiny issue where the name over their head wont be there anymore... maybe i can fix that
-            Citrus.World.SendMessageToClients(EventCode.Login, LoginData(player, player.GroupIndex, gearData), AllExcept(ind), true);
+            Wobble.World.SendMessageToClients(EventCode.Login, LoginData(player, player.GroupIndex, gearData), AllExcept(ind), true);
 
         }
 

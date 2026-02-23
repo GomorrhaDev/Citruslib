@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CitrusLib")]
+[assembly: AssemblyTitle("WobbleBridge")]
 [assembly: AssemblyDescription("A Function Library for Totally Accurate Battlegrounds")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CitrusLib")]
-[assembly: AssemblyCopyright("Copyright ©  2023")]
+[assembly: AssemblyProduct("WobbleBridge")]
+[assembly: AssemblyCopyright("Copyright ©  2026")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("956e1ed9-b6ca-4e39-9017-ae0ed560c123")]
+[assembly: Guid("83E2BA82-DBD0-4AA7-9217-780D5D293416")]
 
 // Version information for an assembly consists of the following four values:
 //

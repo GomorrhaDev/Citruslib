@@ -1,9 +1,9 @@
 ﻿using System;
 using UnityEngine;
 
-namespace CitrusLib
+namespace WobbleBridge
 {
-    public static partial class Citrus
+    public static partial class Wobble
     {
         /// <summary>
         /// Gets a random point within the current ring's white circle, snapped to the ground.

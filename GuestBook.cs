@@ -1,14 +1,10 @@
-﻿using Epic.OnlineServices;
-using Landfall.Network;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Epic.OnlineServices;
+using Landfall.Network;
 using UnityEngine;
 
-namespace CitrusLib
+namespace WobbleBridge
 {
     //logs every unique player who connects to the server, useful for moderation. 
     static class GuestBook

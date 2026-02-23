@@ -2,7 +2,7 @@
 using HarmonyLib;
 using Landfall.Network;
 
-namespace CitrusLib.Patches
+namespace WobbleBridge.Patches
 {
 
     [HarmonyPatch(typeof(TABGPlayerBase), "TakeDamage", new Type[] { typeof(float) })]
@@ -17,9 +17,9 @@ namespace CitrusLib.Patches
             if (damagerIndex == byte.MaxValue)
                 return;
 
-            if (Citrus.PlayerActiveWeapons.TryGetValue(damagerIndex, out int weaponId))
+            if (Wobble.PlayerActiveWeapons.TryGetValue(damagerIndex, out int weaponId))
             {
-                float multiplier = Citrus.GetWeaponDamageMultiplier(weaponId);
+                float multiplier = Wobble.GetWeaponDamageMultiplier(weaponId);
                 if (multiplier != 1.0f)
                     dmg *= multiplier;
             }

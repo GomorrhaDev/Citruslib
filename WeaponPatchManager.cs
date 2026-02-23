@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json;
 using BepInEx;
+using Newtonsoft.Json;
 using UnityEngine;
 
-namespace CitrusLib
+namespace WobbleBridge
 {
     public class WeaponPatchManager
     {
@@ -32,11 +32,11 @@ namespace CitrusLib
                 try
                 {
                     File.Move(oldPath, ConfigPath);
-                    Citrus.log.Log($"WeaponPatchManager: Moved config from {oldPath} to {ConfigPath}");
+                    Wobble.log.Log($"WeaponPatchManager: Moved config from {oldPath} to {ConfigPath}");
                 }
                 catch (Exception e)
                 {
-                    Citrus.log.LogError($"WeaponPatchManager: Failed to move old config: {e.Message}");
+                    Wobble.log.LogError($"WeaponPatchManager: Failed to move old config: {e.Message}");
                 }
             }
 
@@ -45,7 +45,7 @@ namespace CitrusLib
 
         public static void ReloadConfig()
         {
-            Citrus.ClearAllWeaponPatches();
+            Wobble.ClearAllWeaponPatches();
             LoadConfig();
         }
 
@@ -67,7 +67,7 @@ namespace CitrusLib
 
                 if (config?.Patches == null)
                 {
-                    Citrus.log.LogWarning("WeaponPatchManager: Config file is empty or invalid.");
+                    Wobble.log.LogWarning("WeaponPatchManager: Config file is empty or invalid.");
                     return;
                 }
 
@@ -77,7 +77,7 @@ namespace CitrusLib
                 {
                     if (!TryResolveWeaponId(kvp.Key, out int id))
                     {
-                        Citrus.log.LogWarning($"WeaponPatchManager: Could not resolve weapon ID for '{kvp.Key}' — skipping.");
+                        Wobble.log.LogWarning($"WeaponPatchManager: Could not resolve weapon ID for '{kvp.Key}' — skipping.");
                         continue;
                     }
 
@@ -85,11 +85,11 @@ namespace CitrusLib
                     loaded++;
                 }
 
-                Citrus.log.Log($"WeaponPatchManager: Loaded {loaded} weapon patch(es).");
+                Wobble.log.Log($"WeaponPatchManager: Loaded {loaded} weapon patch(es).");
             }
             catch (Exception e)
             {
-                Citrus.log.LogError($"WeaponPatchManager: Error loading config: {e.Message}");
+                Wobble.log.LogError($"WeaponPatchManager: Error loading config: {e.Message}");
             }
         }
 
@@ -101,28 +101,28 @@ namespace CitrusLib
             if (patch == null) return;
 
             if (patch.DamageMultiplier.HasValue)
-                Citrus.SetWeaponDamageMultiplier(id, patch.DamageMultiplier.Value);
+                Wobble.SetWeaponDamageMultiplier(id, patch.DamageMultiplier.Value);
 
             if (patch.SpreadMultiplier.HasValue)
-                Citrus.SetWeaponSpreadMultiplier(id, patch.SpreadMultiplier.Value);
+                Wobble.SetWeaponSpreadMultiplier(id, patch.SpreadMultiplier.Value);
 
             if (patch.HipSpreadValue.HasValue)
-                Citrus.SetWeaponHipSpreadValue(id, patch.HipSpreadValue.Value);
+                Wobble.SetWeaponHipSpreadValue(id, patch.HipSpreadValue.Value);
 
             if (patch.ExtraSpread.HasValue)
-                Citrus.SetWeaponExtraSpread(id, patch.ExtraSpread.Value);
+                Wobble.SetWeaponExtraSpread(id, patch.ExtraSpread.Value);
 
             if (patch.FireRateMultiplier.HasValue)
-                Citrus.SetWeaponFireRateMultiplier(id, patch.FireRateMultiplier.Value);
+                Wobble.SetWeaponFireRateMultiplier(id, patch.FireRateMultiplier.Value);
 
             if (patch.BulletSpeedMultiplier.HasValue)
-                Citrus.SetWeaponBulletSpeedMultiplier(id, patch.BulletSpeedMultiplier.Value);
+                Wobble.SetWeaponBulletSpeedMultiplier(id, patch.BulletSpeedMultiplier.Value);
 
             if (patch.MagSizeOverride.HasValue)
-                Citrus.SetWeaponMagSizeOverride(id, patch.MagSizeOverride.Value);
+                Wobble.SetWeaponMagSizeOverride(id, patch.MagSizeOverride.Value);
 
             if (patch.ReloadTimeMultiplier.HasValue)
-                Citrus.SetWeaponReloadTimeMultiplier(id, patch.ReloadTimeMultiplier.Value);
+                Wobble.SetWeaponReloadTimeMultiplier(id, patch.ReloadTimeMultiplier.Value);
         }
 
 
@@ -165,12 +165,12 @@ namespace CitrusLib
             {
                 string json = JsonConvert.SerializeObject(defaultConfig, Formatting.Indented);
                 File.WriteAllText(ConfigPath, json);
-                Citrus.log.Log("WeaponPatchManager: Created default weapon_patches.json");
+                Wobble.log.Log("WeaponPatchManager: Created default weapon_patches.json");
                 LoadConfig();
             }
             catch (Exception e)
             {
-                Citrus.log.LogError($"WeaponPatchManager: Error creating default config: {e.Message}");
+                Wobble.log.LogError($"WeaponPatchManager: Error creating default config: {e.Message}");
             }
         }
 

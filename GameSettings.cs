@@ -2,16 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Unity.Networking.Transport;
-using UnityEngine;
 using Newtonsoft.Json;
+using UnityEngine;
 
-
-namespace CitrusLib
+namespace WobbleBridge
 {
     
 
-    public static partial class Citrus
+    public static partial class Wobble
     {
 
         public static SettingsFile<GameSetting> ExtraSettings = new SettingsFile<GameSetting>("ExtraSettings");
@@ -46,7 +44,7 @@ namespace CitrusLib
     /// <typeparam name="T"></typeparam>
     public class SettingsFile<T> where T: SettingObject
     {
-        static Logger setLog = new Logger("CitrusLib-Settings", ConsoleColor.Cyan);
+        static Logger setLog = new Logger("WobbleBridge-Settings", ConsoleColor.Cyan);
         //public static List<SettingCategory> settings = new List<SettingCategory>();
 
         //public static List<SettingCategory> defaults = new List<SettingCategory>();

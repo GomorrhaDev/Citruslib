@@ -2,9 +2,9 @@
 using Landfall.Network;
 using Unity.Networking.Transport;
 
-namespace CitrusLib
+namespace WobbleBridge
 {
-    public static partial class Citrus
+    public static partial class Wobble
     {
         static ServerClient currentWorld = null;
 

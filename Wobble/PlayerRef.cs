@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Landfall.Network;
 
-namespace CitrusLib
+namespace WobbleBridge
 {
     /// <summary>
     /// Wraps a TABGPlayerServer with a flexible key-value data store.

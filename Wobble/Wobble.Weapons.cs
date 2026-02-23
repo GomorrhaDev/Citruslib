@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Landfall.Network;
 
-namespace CitrusLib
+namespace WobbleBridge
 {
-    public static partial class Citrus
+    public static partial class Wobble
     {
         // ─── Weapon Patch Dictionaries ────────────────────────────────────────────
         // All stored by weapon ID. Unset values fall back to the game's defaults.

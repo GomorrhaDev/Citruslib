@@ -1,0 +1,434 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WobbleBridge</name>
+    </assembly>
+    <members>
+        <member name="M:WobbleBridge.Wobble.AddCommand(System.String[],System.Action{System.String[],Landfall.Network.TABGPlayerServer},System.String,System.String,System.String)">
+            <summary>
+            Adds a chat command that can be triggered by multiple names.
+            </summary>
+        </member>
+        <member name="M:WobbleBridge.Wobble.AddCommand(System.String,System.Action{System.String[],Landfall.Network.TABGPlayerServer},System.String,System.String,System.String,System.Int32)">
+            <summary>
+            Adds a chat command with a single name.
+            </summary>
+        </member>
+        <member name="M:WobbleBridge.Wobble.Teleport(Landfall.Network.TABGPlayerServer,UnityEngine.Vector3,System.Boolean)">
+            <summary>
+            teleports a living player. if the player is dead, they are respawned.
+            </summary>
+            <param name="player">The player to teleport</param>
+            <param name="pos">the position to teleport the player</param>
+            <param name="keepLoot">whether to retain the player's loot or remove it.</param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.Teleport(Landfall.Network.TABGPlayerServer,UnityEngine.Vector3,UnityEngine.Vector2,System.Boolean)">
+            <summary>
+            teleports a living player. if the player is dead, they are respawned.
+            </summary>
+            <param name="player">The player to teleport</param>
+            <param name="pos">the position to teleport the player</param>
+            <param name="rot">the rotation to have the player face</param>
+            <param name="keepLoot">whether to retain the player's loot or remove it.</param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.Respawn(Landfall.Network.TABGPlayerServer,UnityEngine.Vector3,System.Boolean)">
+            <summary>
+            respawns the player using the vanilla method. Also works as a means to teleport players, reviving them if they are dead. 
+            
+            use waituntill ready if the player JUST DIED and you want them to respawn as soon as reasonably possible (after the player slow-motion-effect wears off)
+            </summary>
+            <param name="player"></param>
+            <param name="pos"></param>
+            <param name="waitUntilReady"></param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.KillPlayer(Landfall.Network.TABGPlayerServer,Landfall.Network.TABGPlayerServer)">
+            <summary>
+            kills a player. probably doesnt send them to the respawn minigame, and hopefully doesnt kick the player either
+            </summary>
+            <param name="player">The player to kill</param>
+            <param name="killer">Optional. allows a player to be awarded the kill</param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.SetLoot(Landfall.Network.TABGPlayerServer,System.Int32[],System.Int32[])">
+            <summary>
+            removes a player's loot and gives them items
+            </summary>
+            <param name="player">The player to affect</param>
+            <param name="items">an array of item ids. use the CitrusLib Item!</param>
+            <param name="quantities">an array of quantities for each item</param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.SetLoot(Landfall.Network.TABGPlayerServer,System.Collections.Generic.List{System.Int32},System.Collections.Generic.List{System.Int32})">
+            <summary>
+            removes a player's loot and gives them items
+            </summary>
+            <param name="player">The player to affect</param>
+            <param name="items">a list of item ids. use the CitrusLib Item!</param>
+            <param name="quantities">a list of quantities for each item</param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.SetLoot(Landfall.Network.TABGPlayerServer,WobbleBridge.LootPack)">
+            <summary>
+            Sets a players loot.
+            </summary>
+            <param name="player">The Player to effect</param>
+            <param name="loot">The LootPack to give to the player.</param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.GiveLoot(Landfall.Network.TABGPlayerServer,System.Int32,System.Int32)">
+            <summary>
+            GIVES one stack of an item to a player
+            </summary>
+            <param name="player">The player to affect</param>
+            <param name="item">The item id. use the WobbleBridge Item enumerator!</param>
+            <param name="quantity">Amount of the item to give</param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.GiveLoot(Landfall.Network.TABGPlayerServer,System.String,System.Int32)">
+            <summary>
+            GIVES one stack of an item to a player
+            </summary>
+            <param name="player">The player to affect</param>
+            <param name="item">The item name. use the WobbleBridge Item enumerator!</param>
+            <param name="quantity">Amount of the item to give</param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.GiveLoot(Landfall.Network.TABGPlayerServer,WobbleBridge.LootPack)">
+            <summary>
+            Gives a LootPack of items to a player
+            </summary>
+            <param name="player">the player to affect</param>
+            <param name="lp">The WobbleBridge LootPack</param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.Kick(Landfall.Network.TABGPlayerServer,Epic.OnlineServices.AntiCheatCommon.KickReason,System.String)">
+            <summary>
+            Kicks a player, because the vanilla kick doesnt work under certain conditions.
+            </summary>
+            <param name="player">The player to kick</param>
+            <param name="reason">a KickReason. the player sees this as a number when they are kicked.</param>
+            <param name="logReason">A message as to why they are kicked. only printed to the console</param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.SetTeam(Landfall.Network.TABGPlayerServer,System.Byte)">
+            <summary>
+            tries to set a player to the sepecified team.
+            beacause a clients team cannot ever change, this uses some wildly convoluted "relative" team id switches of non-client peers to create the illusion of a team change.
+            On the server-side (here!), the players are eventually put on the same team.
+            the function, as is, sometimes doesnt work because of lag and stuff. Generally its a good idea NOT to spam this function.
+            </summary>
+            <param name="p"></param>
+            <param name="groupIndex"></param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.SetTeam(WobbleBridge.PlayerRef,WobbleBridge.PlayerTeam)">
+            <summary>
+            tries to set a player's team. this function uses WobbleBridge PlayerRefs and PlayerTeam objects, which might not be easier for you to use than vanilla ids and bytes in the function above.
+            </summary>
+            <param name="player"></param>
+            <param name="team"></param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.SelfParrot(Landfall.Network.TABGPlayerServer,System.String)">
+            <summary>
+            makes the player throw a parrot at their feet with the desired message. Only the player throwing the parrot sees the message.
+            </summary>
+            <param name="p">The player to through the parrot</param>
+            <param name="message">the message</param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.SetGear(Landfall.Network.TABGPlayerServer,System.Int32[])">
+            <summary>
+            Sets a player's gear. the client doesnt see the change, and should probably be alive during such a change.
+            </summary>
+            <param name="player"></param>
+            <param name="gearData"></param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.FixTeams">
+            <summary>
+            yknow how team members are meant to have their names over their heads?
+            changing teams and gear mid match causes issue with that.
+            run this code AFTER calling set team or set gear.
+            this is seperate from those function because you might be calling set team/gear many times and dont need redundant uses of this function.
+            it also only needs to be called on players who have had people *join* their team...
+            </summary>
+        </member>
+        <member name="M:WobbleBridge.Wobble.AllExcept(System.Int32)">
+            <summary>
+            returns a list of all player IDs except the specified one. for use with sendmessage
+            </summary>
+            <param name="i">the index to ignore. doesnt nessesarily have to be a player who is actually connected to the server</param>
+            <returns></returns>
+        </member>
+        <member name="M:WobbleBridge.Wobble.DoOnceAlive(WobbleBridge.PlayerRef,System.Action)">
+            <summary>
+            Performs an action once the player is alive and sending position updates again.
+            The action is performed immediately if the player is currently alive.
+            Good uses: team changes, gear changes.
+            </summary>
+        </member>
+        <member name="M:WobbleBridge.Wobble.DoOnceAlive(Landfall.Network.TABGPlayerServer,System.Action)">
+            <summary>
+            TABGPlayerServer overload of DoOnceAlive.
+            </summary>
+        </member>
+        <member name="M:WobbleBridge.Wobble.WaitThen(System.Single,System.Action)">
+            <summary>
+            Performs an action after a set amount of time.
+            </summary>
+        </member>
+        <member name="M:WobbleBridge.Wobble.WaitUntil(System.Func{System.Boolean},System.Action,System.Single)">
+            <summary>
+            Performs an action once a condition becomes true.
+            </summary>
+            <param name="condition">The condition to wait for.</param>
+            <param name="a">The action to perform once the condition is met.</param>
+            <param name="tick">How often to check the condition in seconds. Don't set very low unless your condition is cheap!</param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.WaitThenAsLongAs(System.Single,System.Func{System.Boolean},System.Action,System.Action,System.Single)">
+            <summary>
+            Performs an action after a set delay, but only if the condition remains true throughout.
+            Invokes the fail action if the condition becomes false at any point.
+            </summary>
+            <param name="time">Time to wait before invoking the succeed action.</param>
+            <param name="condition">The condition that must remain true.</param>
+            <param name="a">The action to perform on success.</param>
+            <param name="fail">The action to invoke on failure (can be null).</param>
+            <param name="tick">How often to check the condition in seconds.</param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.PlayerChatSearch(System.String,Landfall.Network.TABGPlayerServer@)">
+            <summary>
+            Searches for a player first by name prefix, then by player index.
+            Good for chat commands where users can type either a name or a numeric ID.
+            Returns false if none or more than one match is found.
+            </summary>
+        </member>
+        <member name="M:WobbleBridge.Wobble.PlayerWithIndex(System.Byte,Landfall.Network.TABGPlayerServer@)">
+            <summary>
+            Finds a player by their numeric player index.
+            Returns false if none or more than one match is found.
+            </summary>
+        </member>
+        <member name="M:WobbleBridge.Wobble.PlayerWithName(System.String,Landfall.Network.TABGPlayerServer@)">
+            <summary>
+            Finds a player whose name starts with the provided string (case-insensitive).
+            Returns false if none or more than one match is found.
+            </summary>
+        </member>
+        <member name="M:WobbleBridge.Wobble.RandomInRing(System.Int32,System.Predicate{UnityEngine.Vector3})">
+            <summary>
+            Gets a random point within the current ring's white circle, snapped to the ground.
+            </summary>
+            <param name="tries">Number of attempts to find a valid point.</param>
+            <param name="func">Optional predicate for additional position validation.</param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.RandomInCircle(UnityEngine.Vector3,System.Single,System.Int32,System.Predicate{UnityEngine.Vector3},System.Int32)">
+            <summary>
+            Gets a random point on land within a specified radius, snapped to the ground.
+            </summary>
+            <param name="pos">Center of the search circle.</param>
+            <param name="radius">Radius of the search circle.</param>
+            <param name="tries">Number of attempts to find a valid point.</param>
+            <param name="func">Optional predicate for additional position validation.</param>
+            <param name="initTries">Internal use — tracks original try count for error logging.</param>
+        </member>
+        <member name="M:WobbleBridge.Wobble.ClearWeaponPatches(System.Int32)">
+            <summary>Clears all patches for a specific weapon ID.</summary>
+        </member>
+        <member name="M:WobbleBridge.Wobble.ClearAllWeaponPatches">
+            <summary>Clears every weapon patch — use before a config reload.</summary>
+        </member>
+        <member name="M:WobbleBridge.Wobble.GetCurrentWeaponID(Landfall.Network.TABGPlayerServer)">
+            <summary>
+            Gets the current weapon ID directly from the player's equipment slots.
+            Returns -1 if no weapon is active.
+            </summary>
+        </member>
+        <member name="T:WobbleBridge.SettingObject">
+            <summary>
+            A serializable setting, used when making custom settings files.
+            </summary>
+        </member>
+        <member name="F:WobbleBridge.SettingObject.name">
+            <summary>
+            the name of the setting
+            </summary>
+        </member>
+        <member name="F:WobbleBridge.SettingObject.description">
+            <summary>
+            a description of the setting
+            </summary>
+        </member>
+        <member name="T:WobbleBridge.SettingsFile`1">
+            <summary>
+            A Settings file, containing a list of SettingObjects.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:WobbleBridge.SettingsFile`1.SetSetting(System.String,System.String)">
+            <summary>
+            Sets a setting and then writes all settings. use this for mid-match setting changes, via commands for example.
+            </summary>
+            <param name="name">the name of a setting to change</param>
+            <param name="value">the value to set it to</param>
+        </member>
+        <member name="M:WobbleBridge.SettingsFile`1.#ctor(System.String,System.Boolean)">
+            <summary>
+            creates a settings file at the specified path.
+            </summary>
+            <param name="path">The filepath. if absolute is set to false, the filepath starts in the application's directory</param>
+            <param name="absolute">if true, the filepath is relative to the application's install location</param>
+        </member>
+        <member name="M:WobbleBridge.SettingsFile`1.ReadSettings">
+            <summary>
+            reads the settings from it's file. if it doesn't exist, a file with default values is created instead.
+            If the file exists, but some settings are missing, those missing settings are set to their defaults and added to the file
+            </summary>
+        </member>
+        <member name="M:WobbleBridge.SettingsFile`1.WriteSettings">
+            <summary>
+            writes all the settings current values to it's file.
+            </summary>
+        </member>
+        <member name="M:WobbleBridge.SettingsFile`1.AddSetting(`0)">
+            <summary>
+            adds a SettingObject to the DEFAULT settings list. use when initializing the default settings, BEFORE ever reading!
+            </summary>
+            <param name="g">The SettingObject to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:WobbleBridge.SettingsFile`1.TryGetSetting(System.String,`0@)">
+            <summary>
+            looks for a setting with name and returns true if found. 
+            
+            if a setting isnt found in the main settings, returns the default value and re-'reads' the settings file, adding ALL missing entries.
+            
+            if a setting isnt found, returns false!
+            </summary>
+            <param name="name">the name of the setting</param>
+            <param name="g">a SettingObject out parameter</param>
+            <returns></returns>
+        </member>
+        <member name="T:WobbleBridge.GameSetting">
+            <summary>
+            a common purpose SettingObject. Has a string value. it's reccomended to use this when making settings
+            </summary>
+        </member>
+        <member name="F:WobbleBridge.GameSetting.value">
+            <summary>
+            the value of the setting
+            </summary>
+        </member>
+        <member name="T:WobbleBridge.Logger">
+            <summary>
+            A class for prettier debug logging.
+            </summary>
+        </member>
+        <member name="M:WobbleBridge.Logger.#ctor(System.String,System.ConsoleColor)">
+            <summary>
+            Creates a new Logger for your mod.
+            </summary>
+            <param name="n">The name of your mod, or a sub-name if your mod has multiple separate parts.</param>
+            <param name="c">The color of the name prefix.</param>
+        </member>
+        <member name="M:WobbleBridge.Logger.Log(System.String)">
+            <summary>
+            Logs a standard message to the console.
+            </summary>
+        </member>
+        <member name="M:WobbleBridge.Logger.LogWarning(System.String)">
+            <summary>
+            Logs a warning to the console (yellow).
+            </summary>
+        </member>
+        <member name="M:WobbleBridge.Logger.LogError(System.String)">
+            <summary>
+            Logs an error to the console (red).
+            </summary>
+        </member>
+        <member name="T:WobbleBridge.LootPack">
+            <summary>
+            A class for creating groups of items, to simplify item-giving
+            </summary>
+        </member>
+        <member name="M:WobbleBridge.LootPack.#ctor">
+            <summary>
+            makes a new, empty lootpack.
+            </summary>
+        </member>
+        <member name="M:WobbleBridge.LootPack.#ctor(Loot[])">
+            <summary>
+            creates a lootpack using TABG's Loot array as an input
+            </summary>
+            <param name="loot">An array of Loot structs.</param>
+        </member>
+        <member name="M:WobbleBridge.LootPack.AddLoot(System.Int32,System.Int32)">
+            <summary>
+            adds a stack of an item to the loot pack.
+            </summary>
+            <param name="id">the id of the item. use the WobbleBridge Item enum!</param>
+            <param name="amount">the amount to add.</param>
+        </member>
+        <member name="M:WobbleBridge.LootPack.CopyPlayerLoot(System.Collections.Generic.List{Landfall.Network.TABGPlayerLootItem})">
+            <summary>
+            creates a lootpack that is a copy of the provided list of playerlootitems, which can be read from a TABGPlayerServer.
+            </summary>
+            <param name="loot"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WobbleBridge.LootPack.GiveTo(Landfall.Network.TABGPlayerServer)">
+            <summary>
+            gives the items to the player. the player should be alive
+            </summary>
+            <param name="player">the player to recieve the items</param>
+        </member>
+        <member name="T:WobbleBridge.Item">
+            <summary>
+            an enum list of every vanilla item. helps hard-coding item-give commands and lootpacks easier
+            </summary>
+        </member>
+        <member name="T:WobbleBridge.WeaponPatchManager.WeaponPatch">
+            <summary>
+            All fields are nullable — only set fields will override the game's defaults.
+            </summary>
+        </member>
+        <member name="P:WobbleBridge.WeaponPatchManager.WeaponPatch.DamageMultiplier">
+            <summary>Multiplier applied to all damage dealt by this weapon. (1.0 = no change)</summary>
+        </member>
+        <member name="P:WobbleBridge.WeaponPatchManager.WeaponPatch.SpreadMultiplier">
+            <summary>Multiplier applied to the weapon's base spread. (1.0 = no change)</summary>
+        </member>
+        <member name="P:WobbleBridge.WeaponPatchManager.WeaponPatch.HipSpreadValue">
+            <summary>
+            Overrides the hip-fire spread value directly.
+            The game default varies per weapon — set to 0 for perfect hip-fire accuracy.
+            </summary>
+        </member>
+        <member name="P:WobbleBridge.WeaponPatchManager.WeaponPatch.ExtraSpread">
+            <summary>
+            Overrides the extra flat spread added on top of the base spread.
+            Set to 0 to remove all extra spread.
+            </summary>
+        </member>
+        <member name="P:WobbleBridge.WeaponPatchManager.WeaponPatch.FireRateMultiplier">
+            <summary>Multiplier applied to fire rate. (>1.0 = faster, &lt;1.0 = slower)</summary>
+        </member>
+        <member name="P:WobbleBridge.WeaponPatchManager.WeaponPatch.BulletSpeedMultiplier">
+            <summary>Multiplier applied to bullet travel speed. (1.0 = no change)</summary>
+        </member>
+        <member name="P:WobbleBridge.WeaponPatchManager.WeaponPatch.MagSizeOverride">
+            <summary>
+            Directly overrides the magazine size.
+            Replaces the game value entirely — not a multiplier.
+            </summary>
+        </member>
+        <member name="P:WobbleBridge.WeaponPatchManager.WeaponPatch.ReloadTimeMultiplier">
+            <summary>Multiplier applied to reload time. (&lt;1.0 = faster reload, >1.0 = slower)</summary>
+        </member>
+        <member name="T:WobbleBridge.PlayerRef">
+            <summary>
+            Wraps a TABGPlayerServer with a flexible key-value data store.
+            Can be used by other mods to attach custom data to a player.
+            </summary>
+        </member>
+        <member name="M:WobbleBridge.PlayerRef.Get``1(System.String)">
+            <summary>
+            Retrieves a typed value from the data store. Returns default(T) if the key doesn't exist.
+            </summary>
+        </member>
+        <member name="T:WobbleBridge.PlayerTeam">
+            <summary>
+            Represents a team group with a list of PlayerRefs and a group index.
+            </summary>
+        </member>
+    </members>
+</doc>

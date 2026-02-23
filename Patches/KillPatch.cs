@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using Landfall.Network;
 
-namespace CitrusLib.Patches
+namespace WobbleBridge.Patches
 {
 
 //required for kicking players properly. dont ask why.
@@ -10,11 +10,11 @@ namespace CitrusLib.Patches
     {
         static void Prefix(TABGPlayerServer __instance)
         {
-            PlayerRef pref = Citrus.players.Find(pl => pl.player == __instance);
+            PlayerRef pref = Wobble.players.Find(pl => pl.player == __instance);
 
             if (pref == null)
             {
-                Citrus.log.LogError("no playerref found for respawning player??");
+                Wobble.log.LogError("no playerref found for respawning player??");
                 return;
             }
 

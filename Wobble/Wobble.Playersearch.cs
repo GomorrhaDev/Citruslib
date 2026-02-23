@@ -2,9 +2,9 @@
 using System.Linq;
 using Landfall.Network;
 
-namespace CitrusLib
+namespace WobbleBridge
 {
-    public static partial class Citrus
+    public static partial class Wobble
     {
         /// <summary>
         /// Searches for a player first by name prefix, then by player index.

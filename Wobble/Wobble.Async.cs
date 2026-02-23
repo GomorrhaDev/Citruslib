@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Landfall.Network;
 using UnityEngine;
 
-namespace CitrusLib
+namespace WobbleBridge
 {
-    public static partial class Citrus
+    public static partial class Wobble
     {
         /// <summary>
         /// Performs an action once the player is alive and sending position updates again.
